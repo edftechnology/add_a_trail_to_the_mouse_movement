@@ -1,365 +1,312 @@
-<!-- LOGOTIPO DO PROJETO -->
-<div style="display: flex; justify-content: center;">
-   <a href="https://github.com/SEU-USUARIO/SEU-PROJETO">
-     <img src="docs/figures/logo.png" alt="Logo" width="200" height="100">
-   </a>
-</div>
-
-<h3 align="center">NomeDoProjeto</h3>
-
-<div style="display: flex; justify-content: center;">
-  <a href="https://doi.org/SEU-DOI">
-    <img src="https://zenodo.org/badge/SEU_BADGE.svg" alt="DOI">
-  </a>
-</div>
-
-<p align="center">
- Uma descrição curta e genérica do projeto. Substitua por um resumo real quando usar este template.
- <br />
- <a href="https://github.com/SEU-USUARIO/SEU-PROJETO"><strong>Explore os documentos »</strong></a>
- <br />
- <br />
- <a href="https://github.com/SEU-USUARIO/SEU-PROJETO">Ver demonstração</a>
- ·
- <a href="https://github.com/SEU-USUARIO/SEU-PROJETO">Relatar bug</a>
- ·
- <a href="https://github.com/SEU-USUARIO/SEU-PROJETO">Solicitar recurso</a>
-</p>
-
-
-
+# Como instalar/configurar/usar o `rastro do mouse` no `Linux Ubuntu`
 
 ## Resumo
 
-Resumo genérico do projeto. Explique o problema, o objetivo e o valor da solução em 2-4 linhas.
+Guia direto para instalar e configurar um `rastro do mouse` no `Linux Ubuntu` pelo `Terminal Emulator`, usando pacotes instalados via `apt` para compilar e executar um overlay transparente em ambiente `X11`.
 
 ## _Abstract_
 
-_Generic abstract in English. Summarize the purpose, scope, and outputs in 2-4 lines._
-
+_A straightforward guide to install and configure a `mouse trail` on `Linux Ubuntu` through the `Terminal Emulator`, using `apt` packages to build and run a transparent overlay on an `X11` desktop._
 
 
 ## Descrição
 
-`<nome_da_aplicacao>`
+### `rastro do mouse`
 
-Colocar a descrição da aplicação/subaplicação aqui.
+O `rastro do mouse` é um efeito visual que desenha partículas seguindo o ponteiro, semelhante ao recurso de rastro do ponteiro do `Windows`. No `Linux Ubuntu`, especialmente em ambientes `XFCE`/`X11`, esse efeito pode ser obtido com um overlay transparente compilado localmente e configurado para iniciar automaticamente com a sessão.
 
-<!-- COMEÇANDO -->
-### Começando
+Este procedimento usa pacotes instalados via `apt` para preparar o ambiente, compilar o projeto `cursor-trail` e configurar uma textura branca translúcida, removendo o visual roxo padrão.
 
-Este template mostra como documentar a configuração local do projeto. Substitua pelos passos reais.
 
+## Pré-requisitos
 
+- Permissão para usar `sudo`
+- Sessão gráfica `X11`
+- Compositor do ambiente gráfico ativo
+- Conexão com a internet para instalar pacotes e clonar o repositório
+- `apt` funcional no sistema
 
-### Pré-requisitos
 
-Lista genérica de ferramentas necessárias. Ajuste versões e remova o que não se aplica.
+## 1. Abrir o `Terminal Emulator`
 
-* [![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+1. Abrir o `Terminal Emulator`. Você pode fazer isso pressionando:
 
-* [![Anaconda](https://img.shields.io/badge/Anaconda-4.x-44A833?style=flat-square&logo=anaconda&logoColor=white)](https://www.anaconda.com/)
+    ```bash
+    Ctrl + Alt + T
+    ```
 
-* [![Git](https://img.shields.io/badge/Git-2.x-F05032?style=flat-square&logo=git&logoColor=white)](https://git-scm.com/)
 
-* [![VS Code](https://img.shields.io/badge/VS%20Code-1.x-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/) ou qualquer IDE compatível
+2. Certifique-se de que seu sistema esteja limpo e atualizado.
 
-<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+    2.1 Limpar o `cache` do gerenciador de pacotes `apt`. Especificamente, ele remove todos os arquivos de pacotes (`.deb`) baixados pelo `apt` e armazenados em `/var/cache/apt/archives/`. Digite o seguinte comando:
+        
+    ```bash
+    sudo apt clean
+    ```
 
+    2.2 Remover pacotes `.deb` antigos ou duplicados do `cache` local. É útil para liberar espaço, pois remove apenas os pacotes que não podem mais ser baixados (ou seja, versões antigas de pacotes que foram atualizados). Digite o seguinte comando:
 
+    ```bash
+    sudo apt autoclean
+    ```
 
+    2.3 Remover pacotes que foram automaticamente instalados para satisfazer as dependências de outros pacotes e que não são mais necessários. Digite o seguinte comando:
 
-## Guia de instalação
+    ```bash
+    sudo apt autoremove -y
+    ```
 
-### Instalar o Git
+    2.4 Buscar as atualizações disponíveis para os pacotes que estão instalados em seu sistema. Digite o seguinte comando e pressione `Enter`:
 
-Explique como instalar o Git ou remova esta seção se não for necessária.
+    ```bash
+    sudo apt update
+    ```
 
-<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+    2.5 **Corrigir pacotes quebrados**: Isso atualizará a lista de pacotes disponíveis e tentará corrigir pacotes quebrados ou com dependências ausentes:
 
+    ```bash
+    sudo apt --fix-broken install
+    ```
 
+    2.6 Limpar o `cache` do gerenciador de pacotes `apt` novamente:
 
-## Guia de instalação
+    ```bash
+    sudo apt clean
+    ```
 
-### Instalar o Git
+    2.7 Para ver a lista de pacotes a serem atualizados, digite o seguinte comando e pressione `Enter`:
 
-Reforço do conteúdo ou seção extra. Mantenha ou remova conforme o uso do template.
+    ```bash
+    sudo apt list --upgradable
+    ```
 
-<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+    2.8 Realmente atualizar os pacotes instalados para as suas versões mais recentes, com base na última vez que você executou `sudo apt update`. Digite o seguinte comando e pressione `Enter`:
 
+    ```bash
+    sudo apt full-upgrade -y
+    ```
 
 
-#### `Windows` [2]
+## 3. Instalar as dependências do `rastro do mouse` via `apt`
 
-Explique como configurar SSH no Windows (ou ajuste para o provedor desejado).
+O `Linux Ubuntu` não possui, por padrão, uma opção nativa universal para rastro de ponteiro igual ao `Windows`. Para obter esse efeito em `X11`, instale via `apt` as dependências de compilação, janela transparente e diagnóstico gráfico.
 
-1. Verifique se o Git está instalado.
-2. Abra o Git Bash.
-3. Gere uma chave SSH (`ssh-keygen -t rsa -C "seu_email@exemplo.com"`).
-4. Adicione a chave no provedor (GitHub/GitLab/Bitbucket).
+1. Habilitar o repositório `universe`, quando necessário:
 
-<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+    ```bash
+    sudo add-apt-repository universe
+    sudo apt update
+    ```
 
+2. Instalar os pacotes necessários:
 
+    ```bash
+    sudo apt install -y \
+        git \
+        cmake \
+        build-essential \
+        pkg-config \
+        libglfw3-dev \
+        libx11-dev \
+        libxext-dev \
+        x11-utils \
+        xdotool \
+        imagemagick
+    ```
 
-### Atualizar pacotes `pip` e `setuptools` [3]
+3. Confirmar que a sessão atual usa `X11`:
 
-Exemplo genérico de atualização de pacotes:
+    ```bash
+    echo "$XDG_SESSION_TYPE"
+    ```
 
-1. `pip install --upgrade pip`
-2. `pip install --upgrade setuptools`
-3. `pip install --upgrade wheel`
+    A saída esperada é:
 
+    ```bash
+    x11
+    ```
 
 
-### Clonar o repositório do Git e instalar dependências
+## 4. Baixar, compilar e instalar o `cursor-trail`
 
-#### `Linux`
+1. Criar uma pasta para o projeto e clonar o repositório:
 
-1. **Clone o repositório:**
+    ```bash
+    mkdir -p "$HOME/.local/src"
+    cd "$HOME/.local/src"
+    git clone https://github.com/nayutalienx/cursor-trail.git
+    cd cursor-trail
+    ```
 
-  - **Pelo terminal:** `git clone git@github.com:SEU-USUARIO/SEU-PROJETO.git`
+2. Compilar o projeto com `CMake`:
 
-  - **(Ou)** baixar o `.zip` na página do GitHub
+    ```bash
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    cmake --build build -j"$(nproc)"
+    ```
+
+3. Criar uma textura branca translúcida, mais parecida com o rastro do `Windows`:
+
+    ```bash
+    convert CursorTrail/cursortrail.png \
+        -alpha on \
+        -channel RGB \
+        -evaluate set 100% \
+        +channel \
+        CursorTrail/windows-trail.png
+    ```
+
+4. Configurar o projeto para usar a textura branca:
+
+    ```bash
+    sed -i 's|texture=cursortrail.png|texture=windows-trail.png|' config.ini
+    ```
+
 
-  <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+## 5. Executar o `rastro do mouse`
+
+1. Entrar no diretório dos recursos e iniciar o overlay:
+
+    ```bash
+    cd "$HOME/.local/src/cursor-trail/CursorTrail"
+    ../build/CursorTrail --config ../config.ini
+    ```
+
+2. Para encerrar o processo iniciado no terminal, pressione:
+
+    ```bash
+    Ctrl + C
+    ```
+
+3. Se o rastro aparecer roxo, confirme se a configuração aponta para a textura branca:
+
+    ```bash
+    grep '^texture=' "$HOME/.local/src/cursor-trail/config.ini"
+    ```
 
+    A saída esperada é:
+
+    ```bash
+    texture=windows-trail.png
+    ```
 
 
-#### `Windows`
+## 6. Configurar inicialização automática no `Linux Ubuntu`
 
-1. **Clone o repositório:**
+1. Criar um comando local para iniciar, parar e reiniciar o rastro:
 
-  - **Pelo terminal:** `git clone git@github.com:SEU-USUARIO/SEU-PROJETO.git`
+    ```bash
+    mkdir -p "$HOME/.local/bin" "$HOME/.config/autostart"
+    nano "$HOME/.local/bin/cursor-trail"
+    ```
 
-  - (Ou) baixar o `.zip` na página do GitHub
+2. Inserir o conteúdo abaixo no arquivo:
 
-  <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+    ```bash
+    #!/usr/bin/env bash
+    set -euo pipefail
 
+    APP_DIR="$HOME/.local/src/cursor-trail"
+    BIN="$APP_DIR/build/CursorTrail"
+    RUN_DIR="$APP_DIR/CursorTrail"
+    CONFIG="$APP_DIR/config.ini"
+    PID_FILE="/tmp/cursor-trail.pid"
 
+    case "${1:-start}" in
+      start)
+        "$0" stop
+        setsid "$0" run >/tmp/cursor-trail.log 2>&1 &
+        echo $! > "$PID_FILE"
+        ;;
+      run)
+        cd "$RUN_DIR"
+        "$BIN" --config "$CONFIG"
+        ;;
+      stop)
+        if [ -f "$PID_FILE" ]; then
+          kill "$(cat "$PID_FILE")" 2>/dev/null || true
+          rm "$PID_FILE"
+        fi
+        pkill -f "$BIN --config $CONFIG" 2>/dev/null || true
+        ;;
+      restart)
+        "$0" stop
+        "$0" start
+        ;;
+      status)
+        if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+          echo "CursorTrail is running"
+        else
+          echo "CursorTrail is stopped"
+          exit 1
+        fi
+        ;;
+      *)
+        echo "Usage: cursor-trail [start|stop|restart|status]" >&2
+        exit 2
+        ;;
+    esac
+    ```
 
-## Como executar a aplicação
+3. Dar permissão de execução ao comando:
 
-### Executar a partir do `Terminal Emulator`
+    ```bash
+    chmod +x "$HOME/.local/bin/cursor-trail"
+    ```
 
-1. Exemplo genérico de execução:
+4. Criar o arquivo de inicialização automática:
 
-```bash
-python3 main.py --input caminho/para/arquivo --output caminho/para/saida
-```
+    ```bash
+    nano "$HOME/.config/autostart/cursor-trail.desktop"
+    ```
 
-<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+5. Inserir o conteúdo abaixo no arquivo:
 
+    ```bash
+    [Desktop Entry]
+    Type=Application
+    Name=Cursor Trail
+    Comment=Mouse cursor trail overlay
+    Exec=sh -lc '$HOME/.local/bin/cursor-trail start'
+    Terminal=false
+    X-GNOME-Autostart-enabled=true
+    Hidden=false
+    ```
 
+6. Iniciar o rastro imediatamente:
 
+    ```bash
+    "$HOME/.local/bin/cursor-trail" restart
+    "$HOME/.local/bin/cursor-trail" status
+    ```
 
-### Executar a partir da `Graphical User Interface (GUI)`
 
-1. Exemplo genérico de execução:
+## Compatibilidade
 
-```bash
-python3 scripts/app_gui.py
-```
+- Este procedimento é indicado para `Linux Ubuntu` em sessão `X11`.
+- Em `Wayland`, o acesso global à posição do ponteiro e overlays transparentes são mais restritos por segurança.
+- No `XFCE`, mantenha o compositor ativo para que a transparência do overlay funcione corretamente.
+- O pacote `gromit-mpx` existe nos repositórios do `Ubuntu`, mas é uma ferramenta de anotação na tela, não um rastro automático do ponteiro igual ao recurso do `Windows`.
 
 
-
-## Mostrar ajuda
-
-1. Exemplo genérico de ajuda:
-
-```bash
-python3 main.py --help
-```
-
-
-
-### Exemplo de Saída Esperada
-
-Exemplo genérico (substitua pelo help real do projeto):
-
-```bash
-usage: main.py [-h] --input INPUT [--output OUTPUT]
-```
-
-
-
-## O que o aplicativo faz?
-
-Describe in English, at a high level, what the application does and the main outputs.
-
-- Example capability 1
-- Example capability 2
-- Example capability 3
-
-
-
-
-## O que o aplicativo exibe como saída(s)
-
-# Relatório de Análise de Dados
-
-## 1. Introdução
-
-- Objetivo da análise: descrição genérica.
-- Descrição do conjunto de dados analisado: origem, tamanho, formato.
-- Metodologia utilizada para a análise.
-
-## 2. Estatísticas Gerais do Conjunto de Dados
-
-- Número total de variáveis.
-- Número total de registros.
-- Tipos de dados por variável.
-- Resumo da ocupação de memória.
-
-## 3. Qualidade dos Dados
-
-- Valores faltantes: contagem e percentual.
-- Valores únicos por variável.
-- Distribuição de valores nulos ou infinitos.
-- Detecção de espaços em branco no início/fim.
-
-## 4. Estatísticas Descritivas das Variáveis Numéricas
-
-- Contagem de valores válidos.
-- Média, mediana, moda.
-- Desvio padrão e variância.
-- Valor mínimo e máximo.
-- Quartis.
-
-## 5. Análise de Outliers
-
-- Critério de outliers (ex.: 1.5x IQR).
-- Variáveis com maior presença de outliers.
-
-## 6. Correlações Entre Variáveis
-
-- Matriz de correlação.
-- Variáveis altamente correlacionadas.
-
-## 7. Estatísticas de Variáveis Categóricas
-
-- Contagem de ocorrências por categoria.
-- Percentual de distribuição por categoria.
-
-## 8. Análise de Tendências Temporais (se aplicável)
-
-- Distribuição temporal dos dados.
-- Identificação de padrões sazonais.
-
-## 9. Conclusões e Próximos Passos
-
-- Resumo dos principais insights.
-- Sugestões de melhorias/transformações.
-- Próximos passos.
-
-
-## Gráficos Essenciais no Relatório
-
-- Histogramas
-- Boxplots
-- Heatmap de correlação
-- Gráfico de dispersão
-- Gráficos de barras
-- Linha do tempo (se aplicável)
-
-
-
-## 1. Função da Aplicação
-
-Descrição genérica da função principal do módulo.
-
-### 1.1 Entrada(s)
-
-1. Formatos de arquivo suportados (ex.: `.csv`, `.xlsx`).
-
-### 1.2 Saída(s)
-
-1. Descrição das saídas esperadas.
-
-
-
-## 2. Observação(ões)
-
-1. Observações gerais e boas práticas.
-2. Restrições conhecidas.
-
-
-
-# 3. Futura(s) Melhoria(s)
-
-- Lista de melhorias planejadas.
-
-
-
-<!-- LICENÇA -->
 ## Licença
 
-Distribuído sob a licença `MIT`. Consulte `LICENSE.txt` para obter mais informações.
+Este repositório inclui o arquivo `LICENSE.txt`.
 
-<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+## Contato e suporte
 
-
-
-<!-- ROTEIRO -->
-## Roteiro
-
-- [ ] Adicionar registro de alterações
-- [ ] Adicionar links de volta ao topo
-- [ ] Adicionar modelos adicionais com exemplos
-- [ ] Suporte multilíngue
-
-Consulte os problemas abertos para obter uma lista completa dos recursos propostos.
-
-<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
-
-
-
-
-<!-- CONTRIBUIÇÔES -->
-## Contribuições
-
-Explique como contribuir (fork, branch, PR, issues).
-
-1. Bifurque o projeto
-2. Crie sua ramificação (`git checkout -b feature/NovaFuncionalidade`)
-3. Confirme suas alterações (`git commit -m 'Describe change'`)
-4. Envie para a filial (`git push origin feature/NovaFuncionalidade`)
-5. Abra uma solicitação `pull`
-
-<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
-
-
-
-
-<!-- ACKNOWLEDGMENTS -->
-## Agradecimentos
-
-* [Best README Template](https://github.com/othneildrew/Best-README-Template?tab=readme-ov-file)
-
-* [Choose an Open Source License](https://choosealicense.com)
-
-* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
-
-* [Malven's Flexbox Cheatsheet](https://flexbox.malven.co/)
-
-* [Malven's Grid Cheatsheet](https://grid.malven.co/)
-
-* [Img Shields](https://shields.io)
-
-* [GitHub Pages](https://pages.github.com)
-
-* [Font Awesome](https://fontawesome.com)
-
-* [React Icons](https://react-icons.github.io/react-icons/search)
-
-<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
-
-
+Para dúvidas ou problemas, consulte o repositório oficial do `cursor-trail`, a documentação do `GLFW` e a documentação da sua versão do `Linux Ubuntu`.
 
 
 ## Referências
 
-[1] Fonte ou documentação relevante.
-[2] Artigo, tutorial ou manual adicional.
-[3] Outro link útil.
+[1] OPENAI. **Instalar o `rastro do mouse` no `linux ubuntu` pelo `terminal emulator`**. Disponível em: <https://chatgpt.com/g/g-p-6980caf949648191ad6acfcdbe590f9e/project>. ChatGPT. Acessado em: 03/09/2026.
+
+[2] NAYUTALIENX. **Cursor-trail**. Disponível em: <https://github.com/nayutalienx/cursor-trail>. Acessado em: 03/09/2026.
+
+[3] GLFW. **Window guide**. Disponível em: <https://www.glfw.org/docs/3.3/window_guide.html>. Acessado em: 03/09/2026.
+
+[4] UBUNTU. **Details of package build-essential in jammy**. Disponível em: <https://packages.ubuntu.com/jammy/build-essential>. Acessado em: 03/09/2026.
+
+[5] UBUNTU. **Details of source package gromit-mpx in jammy**. Disponível em: <https://packages.ubuntu.com/source/jammy/gromit-mpx>. Acessado em: 03/09/2026.
 
