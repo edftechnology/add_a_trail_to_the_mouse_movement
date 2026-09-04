@@ -15,7 +15,7 @@ _A straightforward guide to install and configure a `mouse trail` on `Linux Ubun
 
 O `rastro do mouse` é um efeito visual que desenha partículas seguindo o ponteiro, semelhante ao recurso de rastro do ponteiro do `Windows`. No `Linux Ubuntu`, especialmente em ambientes `XFCE`/`X11`, esse efeito pode ser obtido com um overlay transparente compilado localmente e configurado para iniciar automaticamente com a sessão.
 
-Este procedimento usa pacotes instalados via `apt` para preparar o ambiente, compilar o projeto `cursor-trail` e configurar uma textura branca translúcida, removendo o visual roxo padrão.
+Este procedimento usa pacotes instalados via `apt` para preparar o ambiente, compilar o projeto `cursor-trail` e configurar uma silhueta preta do ponteiro com transparência, reproduzindo cópias do cursor que desaparecem gradualmente.
 
 
 ## Pré-requisitos
@@ -145,21 +145,18 @@ O `Linux Ubuntu` não possui, por padrão, uma opção nativa universal para ras
     cmake --build build -j"$(nproc)"
     ```
 
-3. Criar uma textura branca translúcida, mais parecida com o rastro do `Windows`:
+3. Criar uma textura de ponteiro preta e transparente, semelhante às cópias do cursor no rastro do `Windows`:
 
     ```bash
-    convert CursorTrail/cursortrail.png \
-        -alpha on \
-        -channel RGB \
-        -evaluate set 100% \
-        +channel \
-        CursorTrail/windows-trail.png
+    convert -size 32x32 xc:none -fill black \
+        -draw 'polygon 3,2 3,26.5 9.3,20.9 13.5,30 17.7,28 13.5,18.9 22,18.9' \
+        PNG32:CursorTrail/windows-cursor-trail.png
     ```
 
-4. Configurar o projeto para usar a textura branca:
+4. Configurar o projeto para usar a textura do ponteiro:
 
     ```bash
-    sed -i 's|texture=cursortrail.png|texture=windows-trail.png|' config.ini
+    sed -i 's|texture=cursortrail.png|texture=windows-cursor-trail.png|' config.ini
     ```
 
 
@@ -178,7 +175,7 @@ O `Linux Ubuntu` não possui, por padrão, uma opção nativa universal para ras
     Ctrl + C
     ```
 
-3. Se o rastro aparecer roxo, confirme se a configuração aponta para a textura branca:
+3. Se o rastro aparecer como pontos ou roxo, confirme se a configuração aponta para a textura do ponteiro:
 
     ```bash
     grep '^texture=' "$HOME/.local/src/cursor-trail/config.ini"
@@ -187,7 +184,7 @@ O `Linux Ubuntu` não possui, por padrão, uma opção nativa universal para ras
     A saída esperada é:
 
     ```bash
-    texture=windows-trail.png
+    texture=windows-cursor-trail.png
     ```
 
 

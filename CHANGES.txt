@@ -10,6 +10,10 @@ facilitar quando incluir uma nova revisão/versão.
 - Revisão do `README.ipynb` para instalação e configuração do `rastro do mouse` no `Linux Ubuntu` com dependências via `apt`.
   - Autor: OpenAI Codex
 
+**Revisão 2** - 04/09/2026
+- Atualização do `README.ipynb` para usar réplicas da silhueta do ponteiro, com transparência e tons decrescentes, em vez de partículas coloridas.
+  - Autor: OpenAI Codex
+
 **Revisão 0** - 10/06/2024
 - Revisão inicial/criação do documento.
   - Autor: Eden Denis F. da S. L. Santos
