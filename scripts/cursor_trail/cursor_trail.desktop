@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Cursor Trail
+Comment=Desktop cursor trail effect
+Exec=/home/edenedfsls/.local/bin/cursor_trail
+Terminal=false
+X-GNOME-Autostart-enabled=true
+Hidden=false
