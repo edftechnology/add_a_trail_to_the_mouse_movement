@@ -3,8 +3,47 @@ set -euo pipefail
 
 APP_DIR="${HOME}/.local/opt/cursor_trail"
 DEPS_LIB_DIR="${HOME}/.local/opt/cursor_trail_deps/usr/lib/x86_64-linux-gnu"
+LOG_FILE="${APP_DIR}/cursor_trail.log"
 
 export LD_LIBRARY_PATH="${DEPS_LIB_DIR}:${LD_LIBRARY_PATH:-}"
 
-cd "${APP_DIR}"
-exec "${APP_DIR}/CursorTrail" --config "${APP_DIR}/config.ini"
+map_window() {
+    if ! command -v xdotool >/dev/null 2>&1; then
+        return 0
+    fi
+
+    for _ in $(seq 1 30); do
+        window_id="$(xdotool search --name '^CursorTrail$' 2>/dev/null | tail -n 1 || true)"
+        if [ -n "${window_id}" ]; then
+            xdotool windowmap "${window_id}" windowmove "${window_id}" 0 0 windowraise "${window_id}" 2>/dev/null || true
+            return 0
+        fi
+        sleep 0.2
+    done
+}
+
+case "${1:-start}" in
+    start)
+        "$0" stop
+        setsid -f "$0" run > "${LOG_FILE}" 2>&1
+        map_window
+        ;;
+    run)
+        cd "${APP_DIR}"
+        exec "${APP_DIR}/CursorTrail" --config "${APP_DIR}/config.ini"
+        ;;
+    stop)
+        pkill -x CursorTrail 2>/dev/null || true
+        ;;
+    restart)
+        "$0" stop
+        "$0" start
+        ;;
+    status)
+        pgrep -a -u "${USER}" -x CursorTrail || true
+        ;;
+    *)
+        echo "Usage: $0 {start|run|stop|restart|status}" >&2
+        exit 2
+        ;;
+esac

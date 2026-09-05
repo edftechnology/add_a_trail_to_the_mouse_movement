@@ -278,6 +278,136 @@ O `Linux Ubuntu` não possui, por padrão, uma opção nativa universal para ras
     ```
 
 
+## É possível deixar igual ao `Windows 11`?
+
+É possível aproximar bem o comportamento visual do `Windows 11`, mas não é correto prometer equivalência perfeita no `Linux`.
+
+O próprio projeto `cursor-trail` separa as implementações por plataforma: no `Windows`, ele usa `Win32 + GDI+` com overlay nativo, transparência real e posicionamento acima das janelas com maior previsibilidade. No `Linux` e no `macOS`, ele usa `OpenGL + GLFW`; a transparência funciona, mas o suporte a overlay depende mais do servidor gráfico, do compositor e do gerenciador de janelas.
+
+Na configuração aplicada neste computador, o resultado foi ajustado para ficar o mais próximo possível do comportamento esperado:
+
+- `XShape` deixa o overlay sem região de entrada, evitando bloquear cliques no `Google Chrome` e em outras janelas.
+- `override_redirect` evita que o `XFCE` reposicione ou oculte a janela do overlay.
+- `XQueryPointer` captura a posição global do mouse em vez de depender da posição relativa à janela.
+- A tela raiz do `X11` define o tamanho total do desktop, permitindo cobrir múltiplas telas.
+- O wrapper `cursor_trail` reinicia o processo e força o mapeamento/elevação da janela quando necessário.
+
+Portanto, o efeito pode ficar parecido com o rastro do `Windows 11` em aparência e uso diário, inclusive com `click-through` e múltiplas telas. A diferença é que no `Linux` essa confiabilidade vem dessas correções específicas para `X11`/`XFCE`, enquanto no `Windows 11` o projeto usa uma API nativa feita para esse tipo de overlay.
+
+
+## 7. Correções aplicadas para `XFCE`/`X11` com múltiplas telas
+
+Durante a configuração local, foram necessários ajustes no projeto `cursor-trail` para resolver dois comportamentos no `Linux Ubuntu` com `XFCE` em sessão `X11`:
+
+- O overlay transparente bloqueava cliques no `Google Chrome` e em outras janelas.
+- Após liberar os cliques, o rastro aparecia apenas na janela do `Terminal Emulator` ou em parte da área visível.
+
+A correção aplicada usa a extensão `XShape` para deixar a janela do overlay sem região de entrada (`click-through`) e usa a tela raiz do `X11` para cobrir a área virtual completa do desktop. No computador configurado, o `xrandr` reportou duas telas empilhadas verticalmente, formando a área total `1920x2160`.
+
+### Arquivos de referência salvos em `scripts/cursor_trail`
+
+Os principais arquivos ajustados foram copiados para `scripts/cursor_trail` para permitir reaplicar a configuração futuramente.
+
+| Arquivo em `scripts/cursor_trail` | Copiar/substituir em |
+|---|---|
+| `CMakeLists.txt` | `$HOME/.local/src/cursor-trail/CMakeLists.txt` ou `docs/cursor-trail/CMakeLists.txt` |
+| `CursorTrail.cpp` | `$HOME/.local/src/cursor-trail/CursorTrail/CursorTrail.cpp` ou `docs/cursor-trail/CursorTrail/CursorTrail.cpp` |
+| `Game.cpp` | `$HOME/.local/src/cursor-trail/CursorTrail/Game.cpp` ou `docs/cursor-trail/CursorTrail/Game.cpp` |
+| `cursor_trail` | `$HOME/.local/bin/cursor_trail` |
+| `cursor_trail.desktop` | `$HOME/.config/autostart/cursor_trail.desktop` |
+
+### Reaplicar os arquivos ajustados
+
+A partir da raiz deste repositório, copie os arquivos de referência para o clone do `cursor-trail` que será compilado:
+
+```bash
+cp scripts/cursor_trail/CMakeLists.txt "$HOME/.local/src/cursor-trail/CMakeLists.txt"
+cp scripts/cursor_trail/CursorTrail.cpp "$HOME/.local/src/cursor-trail/CursorTrail/CursorTrail.cpp"
+cp scripts/cursor_trail/Game.cpp "$HOME/.local/src/cursor-trail/CursorTrail/Game.cpp"
+```
+
+Se estiver usando o `cursor-trail` vendorizado neste repositório, os destinos equivalentes são:
+
+```bash
+cp scripts/cursor_trail/CMakeLists.txt docs/cursor-trail/CMakeLists.txt
+cp scripts/cursor_trail/CursorTrail.cpp docs/cursor-trail/CursorTrail/CursorTrail.cpp
+cp scripts/cursor_trail/Game.cpp docs/cursor-trail/CursorTrail/Game.cpp
+```
+
+Depois, compile novamente:
+
+```bash
+cmake -S "$HOME/.local/src/cursor-trail" -B "$HOME/.local/src/cursor-trail/build" -DCMAKE_BUILD_TYPE=Release
+cmake --build "$HOME/.local/src/cursor-trail/build" -j"$(nproc)"
+```
+
+Instale o binário e os arquivos de inicialização:
+
+```bash
+mkdir -p "$HOME/.local/opt/cursor_trail" "$HOME/.local/bin" "$HOME/.config/autostart"
+install -m 0755 "$HOME/.local/src/cursor-trail/build/CursorTrail" "$HOME/.local/opt/cursor_trail/CursorTrail"
+install -m 0644 "$HOME/.local/src/cursor-trail/config.ini" "$HOME/.local/opt/cursor_trail/config.ini"
+install -m 0644 "$HOME/.local/src/cursor-trail/CursorTrail/cursortrail.png" "$HOME/.local/opt/cursor_trail/cursortrail.png"
+install -m 0644 "$HOME/.local/src/cursor-trail/CursorTrail/sprite.frag" "$HOME/.local/opt/cursor_trail/sprite.frag"
+install -m 0644 "$HOME/.local/src/cursor-trail/CursorTrail/sprite.vs" "$HOME/.local/opt/cursor_trail/sprite.vs"
+install -m 0755 scripts/cursor_trail/cursor_trail "$HOME/.local/bin/cursor_trail"
+install -m 0644 scripts/cursor_trail/cursor_trail.desktop "$HOME/.config/autostart/cursor_trail.desktop"
+```
+
+Reinicie o rastro na sessão atual:
+
+```bash
+pkill -x CursorTrail || true
+setsid -f "$HOME/.local/bin/cursor_trail" > "$HOME/.local/opt/cursor_trail/cursor_trail.log" 2>&1
+```
+
+Confirme no log que as correções foram ativadas:
+
+```bash
+tail -n 80 "$HOME/.local/opt/cursor_trail/cursor_trail.log"
+```
+
+As mensagens esperadas são semelhantes a:
+
+```text
+Using X11 desktop size: 1920x2160
+X11 click-through input region enabled.
+Game initialized with 2048 max particles, texture: cursortrail.png
+```
+
+### Instalação sem `sudo`
+
+Quando não houver permissão interativa para `sudo apt install`, é possível baixar os pacotes `.deb` e extrair as dependências localmente em `$HOME/.local/opt/cursor_trail_deps`. O wrapper `scripts/cursor_trail/cursor_trail` já define `LD_LIBRARY_PATH` apontando para esse prefixo local.
+
+Pacotes usados na configuração local:
+
+```bash
+apt-get download \
+    libglfw3 libglfw3-dev \
+    libgl-dev libglx-dev libopengl-dev libglvnd-dev \
+    libopengl0 libglx0 libgl1 libglvnd0 libglx-mesa0 libgl1-mesa-dri \
+    libxext-dev libxext6 libxrandr-dev libxrandr2 libxrender-dev libxrender1
+```
+
+Extração local:
+
+```bash
+mkdir -p "$HOME/.local/opt/cursor_trail_deps"
+for package_file in ./*.deb; do
+    dpkg-deb -x "$package_file" "$HOME/.local/opt/cursor_trail_deps"
+done
+```
+
+Ao compilar com dependências locais, exporte os caminhos antes do `cmake`:
+
+```bash
+export PKG_CONFIG_PATH="$HOME/.local/opt/cursor_trail_deps/usr/lib/x86_64-linux-gnu/pkgconfig:${PKG_CONFIG_PATH:-}"
+export CPATH="$HOME/.local/opt/cursor_trail_deps/usr/include:${CPATH:-}"
+export LIBRARY_PATH="$HOME/.local/opt/cursor_trail_deps/usr/lib/x86_64-linux-gnu:${LIBRARY_PATH:-}"
+export LD_LIBRARY_PATH="$HOME/.local/opt/cursor_trail_deps/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
+```
+
+
 ## Compatibilidade
 
 - Este procedimento é indicado para `Linux Ubuntu` em sessão `X11`.

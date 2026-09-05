@@ -101,7 +101,11 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_FLOATING, true);
 
     // Improved Windows 11 compatibility - overlay should not take focus
+#if defined(__linux__)
+    glfwWindowHint(GLFW_VISIBLE, false);
+#else
     glfwWindowHint(GLFW_VISIBLE, true);
+#endif
     glfwWindowHint(GLFW_FOCUS_ON_SHOW, false);  // Set to false for proper overlay behavior on Windows 11
     glfwWindowHint(GLFW_DECORATED, false);
 
@@ -229,6 +233,11 @@ void enable_click_through(GLFWwindow* window)
     }
 
     XShapeCombineRectangles(display, x11Window, ShapeInput, 0, 0, nullptr, 0, ShapeSet, YXBanded);
+    XSetWindowAttributes attributes;
+    attributes.override_redirect = True;
+    XChangeWindowAttributes(display, x11Window, CWOverrideRedirect, &attributes);
+    XMoveResizeWindow(display, x11Window, 0, 0, gameObject.Width, gameObject.Height);
+    XMapRaised(display, x11Window);
     XFlush(display);
     std::cout << "X11 click-through input region enabled." << std::endl;
 }
